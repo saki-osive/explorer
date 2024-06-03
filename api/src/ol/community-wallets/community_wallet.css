@@ -1,0 +1,16 @@
+/* src/styles/CommunityWallets.css */
+.wallet {
+    border: 1px solid #ccc;
+    padding: 16px;
+    margin-bottom: 16px;
+  }
+  
+  .wallet h2 {
+    margin-top: 0;
+  }
+  
+  .wallet pre {
+    background-color: #f8f8f8;
+    padding: 8px;
+  }
+  

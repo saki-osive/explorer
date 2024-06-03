@@ -1,0 +1,13 @@
+scalar JSON
+
+type CommunityWallet {
+  id: ID!
+  name: String!
+  balance: Int!
+  awakened: Boolean!
+  multisig: JSON
+}
+
+type Query {
+  communityWallets: [CommunityWallet!]!
+}

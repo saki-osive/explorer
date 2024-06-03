@@ -1,0 +1,199 @@
+# ------------------------------------------------------
+# THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
+# ------------------------------------------------------
+
+interface AbstractTransaction {
+  version: BigInt!
+}
+
+type Module {
+  address: String!
+  name: String!
+  functions: [String!]!
+}
+
+type GqlUserTransactionDeprecated {
+  hash: String!
+  version: Float!
+  gasUsed: Float!
+  success: Boolean!
+  vmStatus: String!
+  sender: String!
+  sequenceNumber: Float!
+  maxGasAmount: Float!
+  gasUnitPrice: Float!
+  expirationTimestamp: Float!
+  moduleAddress: String!
+  moduleName: String!
+  functionName: String!
+  arguments: String!
+  timestamp: Float!
+}
+
+type UserTransactionCollection {
+  size: Float!
+  items: [GqlUserTransactionDeprecated!]!
+}
+
+type ValidatorGrade {
+  compliant: Boolean!
+  proposedBlocks: Float!
+  failedBlocks: Float!
+  ratio: Float!
+}
+
+type Validator {
+  inSet: Boolean!
+  address: Bytes!
+  networkAddresses: String
+  fullnodeAddresses: String
+  votingPower: BigInt!
+  failedProposals: BigInt!
+  successfulProposals: BigInt!
+  account: Account!
+  vouches: [Vouch!]!
+  grade: ValidatorGrade!
+  currentBid: ValidatorCurrentBid!
+}
+
+type Vouch {
+  epoch: BigInt!
+  address: Bytes!
+  inSet: Boolean!
+}
+
+type ValidatorCurrentBid {
+  currentBid: Float!
+  expirationEpoch: Float!
+}
+
+type Account {
+  address: Bytes!
+  balance: Decimal
+  slowWallet: SlowWallet
+  movements(first: Int! = 10, after: String, order: OrderDirection! = ASC): PaginatedMovements!
+}
+
+enum OrderDirection {
+  ASC
+  DESC
+}
+
+type SlowWallet {
+  transferred: Decimal!
+  unlocked: Decimal!
+}
+
+type PageInfo {
+  prevCursor: String
+  hasNextPage: Boolean!
+}
+
+type Movement {
+  amount: Decimal!
+  unlockedAmount: Decimal!
+  lockedAmount: Decimal!
+  balance: Decimal!
+  lockedBalance: Decimal!
+  version: BigInt!
+  transaction: AbstractTransaction!
+}
+
+type MovementEdge {
+  cursor: String!
+  node: Movement!
+}
+
+type PaginatedMovements {
+  edges: [MovementEdge!]
+  totalCount: Float!
+  pageInfo: PageInfo!
+}
+
+type CommunityWallet {
+  name: String
+  description: String
+  address: Bytes!
+}
+
+type Transaction {
+  hash: Bytes!
+  sender: Bytes!
+  status: TransactionStatus!
+  onChainTransaction: AbstractTransaction
+}
+
+enum TransactionStatus {
+  UNKNOWN
+  ON_CHAIN
+  EXPIRED
+}
+
+type UserTransaction implements AbstractTransaction {
+  version: BigInt!
+  hash: Bytes!
+  timestamp: BigInt!
+  success: Boolean!
+  sender: Bytes!
+  moduleAddress: Bytes!
+  moduleName: String!
+  functionName: String!
+  arguments: String!
+}
+
+type BlockMetadataTransaction implements AbstractTransaction {
+  version: BigInt!
+  epoch: BigInt!
+  timestamp: BigInt!
+}
+
+type ScriptUserTransaction implements AbstractTransaction {
+  version: BigInt!
+  timestamp: BigInt!
+  success: Boolean!
+  sender: Bytes!
+}
+
+type GenesisTransaction implements AbstractTransaction {
+  version: BigInt!
+}
+
+type Node {
+  latitude: Float!
+  longitude: Float!
+}
+
+"""Buffer"""
+scalar Bytes
+
+"""BigInt"""
+scalar BigInt
+
+"""Decimal"""
+scalar Decimal
+
+type Query {
+  userTransactions(limit: Int!, offset: Int!, order: String!): UserTransactionCollection!
+  modules: [Module!]!
+  account(address: Bytes!): Account
+  validators: [Validator!]!
+  communityWallets: [CommunityWallet!]!
+  walletTransactions(address: Bytes!): [Transaction!]!
+  transaction(hash: Bytes!): Transaction!
+  nodes: [Node!]
+}
+
+type Mutation {
+  newTransaction(signedTransaction: Bytes!): Transaction!
+  walletSubscribe(walletAddress: Bytes!, deviceToken: String!, deviceType: DeviceType!): Boolean!
+}
+
+enum DeviceType {
+  IOS
+  ANDROID
+}
+
+type Subscription {
+  walletMovement(address: Bytes!): String!
+  walletTransaction(address: Bytes!): Transaction!
+}

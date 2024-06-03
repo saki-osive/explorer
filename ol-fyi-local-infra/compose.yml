@@ -1,0 +1,63 @@
+services:
+  nats:
+    image: nats:2.10.11-alpine3.19
+    command: ["-js"]
+    ports:
+      - 4222:4222
+      - 8222:8222
+
+  clickhouse:
+    image: clickhouse/clickhouse-server:24.1.5.6-alpine
+    environment:
+      CLICKHOUSE_DB: olfyi
+      CLICKHOUSE_USER: olfyi
+      CLICKHOUSE_DEFAULT_ACCESS_MANAGEMENT: 1
+      CLICKHOUSE_PASSWORD: olfyi
+    ulimits:
+      nofile:
+        soft: "262144"
+        hard: "262144"
+    ports:
+      - 8123:8123
+      - 9000:9000
+    volumes:
+      - ./volumes/clickhouse/var/lib/clickhouse:/var/lib/clickhouse
+
+  postgres:
+    image: postgres:16.2-alpine
+    environment:
+      POSTGRES_USER: olfyi
+      POSTGRES_PASSWORD: olfyi
+      POSTGRES_DB: olfyi
+    volumes:
+      - ./volumes/postgres/var/lib/postgresql/data:/var/lib/postgresql/data
+    ports:
+      - 5432:5432
+
+  redis:
+    image: redis/redis-stack:7.2.0-v8
+    ports:
+      - 6379:6379
+      # - 8001:8001
+
+  minio:
+    image: minio/minio:RELEASE.2024-05-10T01-41-38Z
+    command: server /data
+    environment:
+      MINIO_ROOT_USER: minioadmin
+      MINIO_ROOT_PASSWORD: minioadmin123
+    volumes:
+      - ./volumes/minio/data:/data
+    ports:
+      - 9003:9000
+
+  # geoipupdate:
+  #   image: ghcr.io/maxmind/geoipupdate:v7.0.1
+  #   restart: unless-stopped
+  #   environment:
+  #     GEOIPUPDATE_ACCOUNT_ID: "${GEOIPUPDATE_ACCOUNT_ID}"
+  #     GEOIPUPDATE_LICENSE_KEY: "${GEOIPUPDATE_LICENSE_KEY}"
+  #     GEOIPUPDATE_EDITION_IDS: "GeoLite2-ASN GeoLite2-City GeoLite2-Country"
+  #     GEOIPUPDATE_FREQUENCY: "72"
+  #   volumes:
+  #     - ./volumes/geoipupdate/usr/share/GeoIP:/usr/share/GeoIP

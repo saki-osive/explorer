@@ -1,0 +1,81 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+
+} 
+
+enum DeviceType {
+  IOS
+  ANDROID
+}
+
+model Device {
+  id    String     @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  token String
+  type  DeviceType
+
+  walletSubscriptions WalletSubscription[]
+
+  @@unique([token, type])
+}
+
+model WalletSubscription {
+  walletAddress Bytes
+  deviceId      String @db.Uuid
+
+  device Device @relation(fields: [deviceId], references: [id])
+
+  @@id([walletAddress, deviceId])
+}
+
+model CommunityWallet {
+    id        String   @id @default(cuid())
+    name      String
+    balance   Int
+    awakened  Boolean
+    multisig  Json?
+
+} 
+
+model Validator {
+  address     Bytes   @id
+  validatorIp String?
+  fullNodeIp  String?
+}
+
+model Node {
+  ip            String    @id
+  latitude      Float
+  longitude     Float
+  lastCheck     DateTime?
+  isUp          Boolean?
+  ledgerVersion BigInt?
+}
+
+enum PendingTransactionStatus {
+  UNKNOWN
+  ON_CHAIN
+  EXPIRED
+}
+
+model PendingTransaction {
+  hash                    Bytes    @id
+  sender                  Bytes
+  sequenceNumber          BigInt
+  maxGasAmount            BigInt
+  gasUnitPrice            BigInt
+  expirationTimestampSecs BigInt
+  chainId                 Int
+  publicKey               Bytes
+  signature               Bytes
+  functionName            String
+  moduleAddress           Bytes
+  moduleName              String
+  args                    Bytes[]
+  typeArgs                String[]
+  status PendingTransactionStatus @default(UNKNOWN)
+}
